@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="referrer" content="no-referrer">
+<title>EMU Task Participation</title>
+<style>
+  :root{
+    --bg:#ffffff; --surface:#ffffff; --surface-2:#f7f8fa; --surface-3:#eef0f4;
+    --ink:#14161a; --ink-2:#4a4f58; --ink-3:#7b818c;
+    --line:#e2e5ea; --line-2:#cfd4dc;
+    --accent:#3a5bd9; --accent-soft:#e6ebfb; --accent-ink:#2a44a8;
+    --hl:#fff6d9;
+    --cell:22px; --head:80px; --rowlabel:230px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0e1014; --surface:#14171d; --surface-2:#191d24; --surface-3:#212632;
+      --ink:#eef1f6; --ink-2:#aab2c0; --ink-3:#7d8694;
+      --line:#262c37; --line-2:#333b49;
+      --accent:#7e9bff; --accent-soft:#1d2740; --accent-ink:#a8bcff;
+      --hl:#2a2616;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0e1014; --surface:#14171d; --surface-2:#191d24; --surface-3:#212632;
+    --ink:#eef1f6; --ink-2:#aab2c0; --ink-3:#7d8694;
+    --line:#262c37; --line-2:#333b49;
+    --accent:#7e9bff; --accent-soft:#1d2740; --accent-ink:#a8bcff;
+    --hl:#2a2616;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font:14px/1.45 ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1600px;margin:0 auto;padding:28px 16px 56px}
+  header h1{margin:0 0 4px;font-size:21px;letter-spacing:-.01em;font-weight:650}
+  header p{margin:0;color:var(--ink-2);font-size:13px;max-width:72ch}
+  .stats{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 14px}
+  .stat{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:9px 13px;min-width:92px}
+  .stat b{display:block;font-size:19px;font-weight:650;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .stat span{font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em}
+  .controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 14px}
+  .controls label{font-size:12px;color:var(--ink-3);margin-right:2px}
+  select,button,input[type=search]{
+    font:inherit;font-size:13px;color:var(--ink);background:var(--surface);
+    border:1px solid var(--line-2);border-radius:8px;padding:5px 9px;
+  }
+  button{cursor:pointer}
+  button:hover,select:hover{border-color:var(--accent)}
+  input[type=search]{min-width:170px}
+  .spacer{flex:1}
+
+  .scroller{
+    border:1px solid var(--line);border-radius:12px;overflow:auto;
+    background:var(--surface);max-height:78vh;position:relative;
+  }
+  table{border-collapse:separate;border-spacing:0;font-variant-numeric:tabular-nums}
+  th,td{padding:0;margin:0}
+
+  /* ---- column headers (participant ids), rotated ---- */
+  thead th{position:sticky;top:0;z-index:3;background:var(--surface);}
+  th.corner{left:0;z-index:5;width:var(--rowlabel);min-width:var(--rowlabel);
+    height:var(--head);text-align:left;vertical-align:bottom;
+    padding:0 10px 8px;font-size:11px;font-weight:600;color:var(--ink-3);
+    text-transform:uppercase;letter-spacing:.06em;
+    border-bottom:1px solid var(--line-2);border-right:1px solid var(--line-2);}
+  th.ntot{right:0;z-index:4;width:62px;min-width:62px;height:var(--head);vertical-align:bottom;
+    padding:0 8px 8px;font-size:11px;font-weight:600;color:var(--ink-3);
+    text-transform:uppercase;letter-spacing:.06em;text-align:right;
+    border-bottom:1px solid var(--line-2);border-left:1px solid var(--line-2);}
+  th.pid{height:var(--head);width:var(--cell);
+    min-width:var(--cell);max-width:var(--cell);
+    text-align:center;vertical-align:bottom;padding-bottom:6px;
+    border-bottom:1px solid var(--line-2);}
+  th.pid .rot{
+    display:inline-block;writing-mode:vertical-rl;transform:rotate(180deg);
+    font-size:11px;font-weight:500;color:var(--ink-2);
+    white-space:nowrap;letter-spacing:.02em;
+  }
+  th.pid.on .rot{color:var(--accent-ink);font-weight:700}
+
+  /* ---- body ---- */
+  th.task{position:sticky;left:0;z-index:2;background:var(--surface);
+    width:var(--rowlabel);min-width:var(--rowlabel);text-align:left;
+    padding:0 10px;height:var(--cell);font-weight:500;font-size:12.5px;
+    border-right:1px solid var(--line-2);border-bottom:1px solid var(--line);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  th.task .alias{color:var(--ink-3);font-size:10px;margin-left:5px}
+  tr.on th.task{background:var(--hl);color:var(--accent-ink);font-weight:650}
+  td.n{position:sticky;right:0;z-index:2;background:var(--surface);
+    width:62px;min-width:62px;border-left:1px solid var(--line-2);
+    border-bottom:1px solid var(--line);padding:0 8px;height:var(--cell);}
+  td.n .barwrap{display:flex;align-items:center;gap:5px;justify-content:flex-end}
+  td.n .bar{height:8px;border-radius:4px;background:var(--accent);opacity:.85}
+  td.n i{font-style:normal;font-size:11px;color:var(--ink-2);min-width:16px;text-align:right}
+  tr.on td.n{background:var(--hl)}
+
+  td.c{width:var(--cell);min-width:var(--cell);height:var(--cell);
+    border-bottom:1px solid var(--line);border-right:1px solid var(--line);
+    text-align:center;vertical-align:middle;position:relative;}
+  td.c.hit{background:var(--accent-soft)}
+  td.c.hit::after{
+    content:"";position:absolute;left:50%;top:50%;
+    width:9px;height:5px;margin:-4px 0 0 -5px;
+    border-left:2px solid var(--accent);border-bottom:2px solid var(--accent);
+    transform:rotate(-45deg);border-radius:1px;
+  }
+  tr.on td.c, td.c.oncol{background:var(--hl)}
+  tr.on td.c.hit, td.c.hit.oncol{background:var(--accent-soft)}
+  tbody tr:last-child th.task,tbody tr:last-child td{border-bottom:none}
+  tr.dim th.task,tr.dim td{opacity:.26}
+
+  /* totals row */
+  tfoot th,tfoot td{position:sticky;bottom:0;z-index:3;background:var(--surface-2);
+    border-top:1px solid var(--line-2);height:26px;font-size:11px;color:var(--ink-2)}
+  tfoot th.task{left:0;z-index:4;font-weight:600;color:var(--ink-3);
+    text-transform:uppercase;letter-spacing:.06em;font-size:10.5px;background:var(--surface-2)}
+  tfoot td.c{text-align:center;font-size:10.5px;line-height:26px;color:var(--ink-2);border-right:1px solid var(--line)}
+  tfoot td.c.oncol{background:var(--hl);color:var(--accent-ink);font-weight:700}
+  tfoot td.n{right:0;z-index:4;background:var(--surface-2);text-align:right;font-weight:600;color:var(--ink-2);font-size:11px;line-height:26px}
+
+  #tip{position:fixed;pointer-events:none;z-index:50;opacity:0;transition:opacity .08s;
+    background:var(--ink);color:var(--bg);font-size:12px;padding:5px 9px;border-radius:7px;
+    white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.22)}
+  #tip.show{opacity:1}
+  .legend{display:flex;gap:16px;align-items:center;margin:12px 0 0;font-size:12px;color:var(--ink-2);flex-wrap:wrap}
+  .key{display:inline-flex;align-items:center;gap:7px}
+  .swatch{width:16px;height:16px;border-radius:4px;border:1px solid var(--line-2);position:relative;background:var(--surface)}
+  .swatch.yes{background:var(--accent-soft);border-color:var(--accent-soft)}
+  .swatch.yes::after{content:"";position:absolute;left:50%;top:50%;width:8px;height:4px;margin:-3px 0 0 -4px;
+    border-left:2px solid var(--accent);border-bottom:2px solid var(--accent);transform:rotate(-45deg)}
+  .notes{margin:22px 0 0;font-size:12.5px;color:var(--ink-2);line-height:1.6;max-width:86ch}
+  .notes h2{font-size:13px;color:var(--ink);margin:0 0 6px;font-weight:650}
+  .notes code{background:var(--surface-3);padding:1px 5px;border-radius:4px;font-size:11.5px}
+  .notes ul{margin:6px 0 0;padding-left:18px}
+  @media (max-width:640px){ .wrap{padding:18px 16px 40px} :root{--rowlabel:170px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>EMU Task Participation</h1>
+    <p>Every task run in the EMU, by participant. A check marks that the participant is listed for that task in <code>participants.csv</code>. Participants with no listed task are omitted.</p>
+  </header>
+  <div class="stats" id="stats"></div>
+  <div class="controls">
+    <label for="sortTask">Rows</label>
+    <select id="sortTask">
+      <option value="count">Most participants first</option>
+      <option value="alpha">A–Z</option>
+    </select>
+    <label for="sortPid">Columns</label>
+    <select id="sortPid">
+      <option value="id">Participant ID</option>
+      <option value="count">Most tasks first</option>
+    </select>
+    <input type="search" id="find" placeholder="Filter tasks…" aria-label="Filter tasks">
+    <span class="spacer"></span>
+    <button id="csv">Download CSV</button>
+    <button id="theme" aria-label="Toggle dark mode">◐ Theme</button>
+  </div>
+
+  <div class="scroller" id="scroller">
+    <table id="grid"><thead></thead><tbody></tbody><tfoot></tfoot></table>
+  </div>
+
+  <div class="legend">
+    <span class="key"><span class="swatch yes"></span> participated</span>
+    <span class="key"><span class="swatch"></span> not listed</span>
+    <span class="key" style="color:var(--ink-3)">Hover a cell to read the pair; the right-hand bar is the per-task count.</span>
+  </div>
+
+  <div class="notes" id="notes"></div>
+</div>
+<div id="tip" role="tooltip"></div>
+<script id="data">const DATA={"source":"participants.csv","emids":["EM1036","EM1037","EM1039","EM1041","EM1042","EM1043","EM1049","EM1053","EM1054","EM1055","EM1056","EM1057","EM1059","EM1060","EM1064","EM1065","EM1070","EM1071","EM1078","EM1080","EM1083","EM1086","EM1087","EM1091","EM1093","EM1094","EM1096","EM1097","EM1100","EM1101","EM1102","EM1103","EM1103-2","EM1118","EM1120","EM1122","EM1123","EM1125","EM1125-2","EM1126","EM1127","EM1128","EM1149","EM1168","EM1169","EM1175","EM1177","EM1178","EM1181","EM1182","EM1183","EM1184","EM1185","EM1186","EM1188","EM1201","EM1202","EM1219","EM1220","EM1221","EM1224","EM1225","EM1226","EM1228","EM1231","EM1233","EM1234","EM1239","EM1244","EM1245","EM1246","EM1252","EM1265","EM1268","EM1269","EM1270","EM1271","EM1279","EM1283","EM1285","EM1287","EM1289","EM1291","EM1295","EM1295-2","EM1296","EM1301","EM1303","EM1304","EM1309","EM1310","EM1312","EM1319","EM1322","EM1323","EM1324","EM1326","EM1330","EM1332","EM1334","EM1336","EM1337","EM1340","EM1342","EM1347","EM1348","EM1349","EM1351","EM1353","EM1361","EM1362","EM1364","EM1367","EM1387","EM1391","EM1394","EM1399","EM1404","EM1407","EM1408","EM1411","EM1412","MG78b","MG146","MG147","MG148","MG186","MG201"],"tasks":[{"name":"LangLoc (auditory)","key":"LangLocAudio","n":54,"aliases":["AudioLangLoc","AudioLangLoc-2","LangLoc-Audio","LangLoc-Audio-2","LangLocAud","LangLocAud-2","LangLocAudio-1","LangLocAudio-2","LangLocAudio1","LangLocAudio2","LangLoc_Audio","LanglocAudio","langloc_audio","langlocaudio"]},{"name":"DySoc","key":"DySoc","n":29,"aliases":["DySoc1","DySoc2","Dysoc","dysoc"]},{"name":"VisualEncoding","key":"VisualEncoding","n":29,"aliases":["VisEnc","VisualEncoding2","visualencoding"]},{"name":"ANN","key":"ANN","n":25,"aliases":["ANN-02","ANN-2","ANN_2"]},{"name":"LangLoc","key":"LangLoc","n":21,"aliases":["LangLoc-2","Langloc"]},{"name":"Olfactometer","key":"Olfactometer","n":21,"aliases":["Olfactometer2","olfactometer"]},{"name":"esfMRI (scan)","key":"esfMRI-scan","n":17,"aliases":["ESfMRI-scan"]},{"name":"Olfactory/Gustatory","key":"Olfactory/Gustatory","n":17,"aliases":["OlfactoryGustatory","olfactorygustatory"]},{"name":"PhysicalStability","key":"PhysicalStability","n":17,"aliases":["PhyStab","PhysStab","PhysStab-02","Physical_Stability"]},{"name":"ToM","key":"ToM","n":17,"aliases":[]},{"name":"ToolLocalizer","key":"ToolLocalizer","n":17,"aliases":["ToolLoc","ToolLoc-02","Tool_Localizer"]},{"name":"Lombard","key":"Lombard","n":15,"aliases":[]},{"name":"SMSL","key":"SMSL","n":15,"aliases":["SMSL2"]},{"name":"SpatialWM","key":"SpatialWM","n":15,"aliases":[]},{"name":"Stories","key":"Stories","n":15,"aliases":["Stories-2","Stories-3","Stories-4","Stories1","Stories2","stories"]},{"name":"MusicLocalizer","key":"MusicLocalizer","n":11,"aliases":["MusicLoc","MusicLoc-2","MusicLocalizer-2"]},{"name":"ToM2","key":"ToM2","n":11,"aliases":["TOM2&TOM_natus","ToM_2"]},{"name":"esfMRI (bedside, stim)","key":"esfMRI-bedside-stim","n":10,"aliases":["ESfMRI-bedside-stim","ESfMRI-bedside-stim-1","ESfMRI-bedside-stim-2"]},{"name":"Logic","key":"Logic","n":10,"aliases":["Logic2"]},{"name":"NatStories","key":"NatStories","n":9,"aliases":["NatStories-01","NatStories-02","NatStories2","Nat_Stories","NaturalStories"]},{"name":"SpeechLangLoc","key":"SpeechLangLoc","n":8,"aliases":["SpeechLangLoc1","SpeechLangLoc2"]},{"name":"esfMRI (bedside)","key":"esfMRI-bedside","n":7,"aliases":["esfMRI-bediside"]},{"name":"LangMathMusic","key":"LangMathMusic","n":7,"aliases":["LangMathMusic-2"]},{"name":"LangLoc (visual)","key":"LangLocVisual","n":6,"aliases":["LangLoc_Visual","LanglocVisual"]},{"name":"SchematicBodies","key":"SchematicBodies","n":6,"aliases":["SchemBod"]},{"name":"VisualFamiliarity","key":"VisualFamiliarity","n":6,"aliases":[]},{"name":"PhysicsLocalizer","key":"PhysicsLocalizer","n":5,"aliases":[]},{"name":"LangBaseline6Words","key":"LangBaseline6Words","n":3,"aliases":["LangBaseline6Words2"]},{"name":"Olfactory EStim","key":"OlfactoryEStim","n":3,"aliases":["OlfactionEStim"]},{"name":"Arithmetic","key":"Arithmetic","n":2,"aliases":[]},{"name":"MIDIScrambling","key":"MIDIScrambling","n":2,"aliases":["MIDIScrambling-2"]},{"name":"PhysicsVSocial","key":"PhysicsVSocial","n":2,"aliases":[]},{"name":"VisualEncoding follow-up","key":"VisualEncodingFollowUp","n":2,"aliases":["VisualEncodingFollowUp2","VisualEncoding_FollowUp","VisualEncoding_FollowUp_Survey"]},{"name":"aAAC","key":"aAAC","n":1,"aliases":[]},{"name":"Alice","key":"Alice","n":1,"aliases":[]},{"name":"AM","key":"AM","n":1,"aliases":[]},{"name":"ArticLoc","key":"ArticLoc","n":1,"aliases":[]},{"name":"ClinicalLangMapping","key":"ClinicalLangMapping","n":1,"aliases":[]},{"name":"esfMRI (from MIT)","key":"esfMRI-from-MIT","n":1,"aliases":[]},{"name":"esfMRI (planning)","key":"ESfMRI-plan","n":1,"aliases":[]},{"name":"FN","key":"FN","n":1,"aliases":[]},{"name":"iPad movie","key":"ipad-movie","n":1,"aliases":[]},{"name":"Jenga","key":"Jenga","n":1,"aliases":[]},{"name":"Language_Localizer","key":"Language_Localizer","n":1,"aliases":[]},{"name":"LMM","key":"LMM","n":1,"aliases":[]},{"name":"Mapping","key":"Mapping","n":1,"aliases":[]},{"name":"Olfaction","key":"Olfaction","n":1,"aliases":[]},{"name":"PhysicalReasoningPilot","key":"PhysicalReasoningPilot","n":1,"aliases":["physicalreasoning_pilot"]},{"name":"VisualVariety","key":"VisualVariety","n":1,"aliases":[]}],"matrix":[[0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,1,1,1,1,0,1,0,1,1,1,1,0,1,0,0,1,1,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,1,1,0,1,1,1,0,0,1,1,0,1,1,1,1,1,0,1,1,1,1,1,0,0,0,1,1,0,1,0,1,1,0,0,0,0,0,1,0,1,1,1,1,1,1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,1,1,1,0,1,1,1,1,0,0,0,0,1,0,0,1,0,1,1,0,1,0,0,1,1,0,1,0,0,1,0,0,1,0,0,1,1,1,1,0,0,0,1,1,1,1,0,0,0,0,0,0,1],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,1,0,1,1,1,0,0,1,0,0,0,0,1,0,1,1,1,0,0,0,0,1,0,0,0,1,0,1,0,0,0,0,0,1,0,0,1,1,1,1,1,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,1,0,1,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0],[0,0,0,1,1,0,1,0,0,0,0,0,0,0,0,1,1,1,1,0,1,1,0,0,0,1,0,0,0,0,0,0,0,1,0,1,0,0,0,1,1,0,0,1,0,0,1,1,0,1,1,0,0,1,0,1,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0],[0,0,0,1,1,0,1,0,1,0,0,1,1,0,0,1,1,1,0,1,1,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,1,0,0,1,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,1,0,1,0,1,1,1,0,1,1,1,1,0,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,0,1,0,0,1,0,0,1,0,1,1,0,0,0,0,0,1,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,0,0,0,1,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0],[1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,1,1,1,0,0,1,0,0,0,0,0,1,0,0,1,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,1,0,0,1,0,1,1,1,0,0,0,0,0,0,0,1,0,0,0,1,0,1,1,0,0,1,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,1,1,0,0,0,1,0,0,0,0,0,1,0,0,1,1,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0],[0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,1,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,1,0,1,1,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,0,1,1,1,1,1,0,0,1,0,1,0,1,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,1,0,0,0,0,0,0,0,0,0,1,0,1,1,0,0,0,0,0,0,0,1,0,1,0,0,1,0,0,1,1,0,0,0,0,0,0,0,0,0,1,0,0,1,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,1,0,0,1,0,1,0,0,1,0,0,0,0,0,1,0,1,0,0,0,0,1,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,1,1,1,0,1,0,0,0,0,1,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,1,0,1,1,0,0,1,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,0,1,0,0,1,0,0,1,0,1,1,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,1,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,1,1,0,1,0,1,1,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,0,0,0,1,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,1,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]],"dropped":["EM1158","EM1158-2","EM1229"],"totalRows":131,"ambiguous":{"ToM2":"ToM2/ToM_2 kept separate from ToM - may be a different paradigm, not a 2nd run","esfMRI-bedside-stim":"stim vs non-stim bedside esfMRI kept separate","ESfMRI-plan":"esfMRI planning session, not a scan","esfMRI-from-MIT":"provenance-tagged esfMRI, site unclear","Olfaction":"could be Olfactory/Gustatory or Olfactometer - ambiguous","Language_Localizer":"could be LangLoc (modality unspecified) - ambiguous","Mapping":"could be ClinicalLangMapping - ambiguous","AM":"unexplained abbreviation","FN":"unexplained abbreviation","LMM":"unexplained abbreviation (possibly LangMathMusic)","aAAC":"unexplained abbreviation"}};</script>
+<script>
+(function(){
+  const T = DATA.tasks, P = DATA.emids, M = DATA.matrix;
+  const nT = T.length, nP = P.length;
+  const colCount = P.map((_,j)=>M.reduce((s,r)=>s+r[j],0));
+  const total = M.reduce((s,r)=>s+r.reduce((a,b)=>a+b,0),0);
+  const maxRow = Math.max(...T.map(t=>t.n));
+
+  const el = id => document.getElementById(id);
+  const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+  el('stats').innerHTML = [
+    [nP,'participants'],[nT,'tasks'],[total,'task runs'],
+    [(total/nP).toFixed(1),'tasks / participant'],
+    [DATA.dropped.length,'omitted (no task)']
+  ].map(([v,l])=>`<div class="stat"><b>${v}</b><span>${l}</span></div>`).join('');
+
+  const aliased = T.filter(t=>t.aliases.length);
+  el('notes').innerHTML = `
+    <h2>How this was built</h2>
+    <p>Source: <code>/Volumes/Nexus4/EMU/participants.csv</code> (${DATA.totalRows} rows; EM1158 appears twice).
+    The <code>tasks</code> field is free text, so spelling variants were folded into one canonical task before
+    counting &mdash; e.g. <code>LangLocAudio</code>, <code>AudioLangLoc</code>, <code>LangLocAud</code>,
+    <code>LangLoc-Audio</code> and <code>LanglocAudio</code> all count as <b>LangLoc (auditory)</b>.
+    Session suffixes were merged into the parent task (<code>DySoc1</code>/<code>DySoc2</code> &rarr; DySoc), so a
+    check means &ldquo;ran this task at least once,&rdquo; not a session count.</p>
+    <ul>
+      <li>Omitted for having no task listed: ${DATA.dropped.map(d=>`<code>${d}</code>`).join(', ')}.
+          <code>EMU</code> and <code>-</code> were treated as &ldquo;no task.&rdquo;</li>
+      <li><code>preop</code>/<code>preopmri</code>, <code>esFMRI</code> and <code>ipad-movie</code> are kept as their own
+          rows although they are scans or incidental recordings rather than experimental tasks.</li>
+      <li><code>esfMRI-bs</code> was read as <code>esfMRI-bedside</code>; the lone <code>esFMRI</code> entry was left
+          separate because it names neither scanner nor bedside.</li>
+      <li>${aliased.length} of ${nT} tasks absorbed at least one spelling variant &mdash; hover a task name to see them.</li>
+    </ul>`;
+
+  // ---------- render ----------
+  let order = {task:'count', pid:'id'};
+  let rowIdx = [], colIdx = [];
+
+  function computeOrder(){
+    rowIdx = T.map((_,i)=>i);
+    if(order.task==='alpha') rowIdx.sort((a,b)=>T[a].name.toLowerCase()<T[b].name.toLowerCase()?-1:1);
+    else rowIdx.sort((a,b)=> T[b].n-T[a].n || (T[a].name.toLowerCase()<T[b].name.toLowerCase()?-1:1));
+    colIdx = P.map((_,j)=>j);
+    if(order.pid==='count') colIdx.sort((a,b)=> colCount[b]-colCount[a] || (P[a]<P[b]?-1:1));
+  }
+
+  function render(){
+    computeOrder();
+    const head = colIdx.map(j=>
+      `<th class="pid" data-col="${j}"><span class="rot">${esc(P[j])}</span></th>`).join('');
+    document.querySelector('#grid thead').innerHTML =
+      `<tr><th class="corner">Task</th>${head}<th class="ntot">n</th></tr>`;
+
+    const body = rowIdx.map(i=>{
+      const t = T[i];
+      const cells = colIdx.map(j=>
+        `<td class="c${M[i][j]?' hit':''}" data-col="${j}" data-row="${i}"></td>`).join('');
+      const w = Math.max(3, Math.round(t.n/maxRow*30));
+      const alias = t.aliases.length ? ` title="also written: ${esc(t.aliases.join(', '))}"` : '';
+      const mark = t.aliases.length ? `<span class="alias">◦</span>` : '';
+      return `<tr data-row="${i}"><th class="task"${alias}>${esc(t.name)}${mark}</th>${cells}`
+           + `<td class="n"><div class="barwrap"><span class="bar" style="width:${w}px"></span><i>${t.n}</i></div></td></tr>`;
+    }).join('');
+    document.querySelector('#grid tbody').innerHTML = body;
+
+    const foot = colIdx.map(j=>`<td class="c" data-col="${j}">${colCount[j]||''}</td>`).join('');
+    document.querySelector('#grid tfoot').innerHTML =
+      `<tr><th class="task">Tasks per participant</th>${foot}<td class="n">${total}</td></tr>`;
+    applyFilter();
+  }
+
+  // ---------- interaction ----------
+  const tip = el('tip');
+  const grid = el('grid');
+  let litCol = null, litRow = null;
+
+  function lightCol(j){
+    if(litCol===j) return;
+    grid.querySelectorAll('td.oncol,th.pid.on').forEach(n=>n.classList.remove('oncol','on'));
+    litCol = j;
+    if(j==null) return;
+    grid.querySelectorAll(`td[data-col="${j}"]`).forEach(n=>n.classList.add('oncol'));
+    const h = grid.querySelector(`th.pid[data-col="${j}"]`); if(h) h.classList.add('on');
+  }
+  function lightRow(i){
+    if(litRow===i) return;
+    grid.querySelectorAll('tr.on').forEach(n=>n.classList.remove('on'));
+    litRow = i;
+    if(i==null) return;
+    const r = grid.querySelector(`tr[data-row="${i}"]`); if(r) r.classList.add('on');
+  }
+
+  grid.addEventListener('mousemove', e=>{
+    const td = e.target.closest('td.c[data-row]');
+    const th = e.target.closest('th.pid');
+    if(td){
+      const i=+td.dataset.row, j=+td.dataset.col;
+      lightCol(j); lightRow(i);
+      tip.textContent = `${P[j]} · ${T[i].name} — ${M[i][j]?'participated':'not listed'}`;
+      tip.classList.add('show');
+      const r = tip.getBoundingClientRect();
+      tip.style.left = Math.min(e.clientX+14, innerWidth-r.width-10)+'px';
+      tip.style.top  = Math.max(8, e.clientY-r.height-12)+'px';
+    } else if(th){
+      const j=+th.dataset.col;
+      lightCol(j); lightRow(null);
+      tip.textContent = `${P[j]} — ${colCount[j]} task${colCount[j]===1?'':'s'}`;
+      tip.classList.add('show');
+      const r = tip.getBoundingClientRect();
+      tip.style.left = Math.min(e.clientX+14, innerWidth-r.width-10)+'px';
+      tip.style.top  = Math.max(8, e.clientY+16)+'px';
+    } else {
+      tip.classList.remove('show'); lightCol(null); lightRow(null);
+    }
+  });
+  grid.addEventListener('mouseleave', ()=>{ tip.classList.remove('show'); lightCol(null); lightRow(null); });
+
+  function applyFilter(){
+    const q = el('find').value.trim().toLowerCase();
+    grid.querySelectorAll('tbody tr').forEach(tr=>{
+      const t = T[+tr.dataset.row];
+      const hit = !q || t.name.toLowerCase().includes(q) ||
+                  t.aliases.some(a=>a.toLowerCase().includes(q));
+      tr.classList.toggle('dim', !hit);
+    });
+  }
+  el('find').addEventListener('input', applyFilter);
+  el('sortTask').addEventListener('change', e=>{ order.task=e.target.value; render(); });
+  el('sortPid').addEventListener('change', e=>{ order.pid=e.target.value; render(); });
+
+  el('csv').addEventListener('click', ()=>{
+    const rows = [['task', ...colIdx.map(j=>P[j])].join(',')];
+    rowIdx.forEach(i=> rows.push([`"${T[i].name}"`, ...colIdx.map(j=>M[i][j])].join(',')));
+    const url = URL.createObjectURL(new Blob([rows.join('\n')], {type:'text/csv'}));
+    const a = Object.assign(document.createElement('a'), {href:url, download:'emu_task_matrix.csv'});
+    a.click(); URL.revokeObjectURL(url);
+  });
+
+  el('theme').addEventListener('click', ()=>{
+    const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+    const cur = document.documentElement.dataset.theme || (dark?'dark':'light');
+    document.documentElement.dataset.theme = cur==='dark'?'light':'dark';
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
