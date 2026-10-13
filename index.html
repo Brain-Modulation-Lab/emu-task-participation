@@ -212,8 +212,7 @@
   el('stats').innerHTML = [
     [nP,'participants',''],
     [DATA.consentYes,'consented to video','consent'],
-    [nT,'tasks',''],[total,'task runs',''],
-    [(total/nP).toFixed(1),'tasks / participant',''],
+    [nT,'tasks',''],
     [DATA.dropped.length,'omitted (no task)','']
   ].map(([v,l,c])=>`<div class="stat ${c}"><b>${v}</b><span>${l}</span></div>`).join('');
 
